@@ -379,6 +379,8 @@ def decoder_layer_masked_self_attention_sublayer(y, w_q, w_k, w_v, w_o, gamma, b
 import torch
 
 def decoder_layer_cross_attention_sublayer(y, encoder_output, w_q, w_k, w_v, w_o, gamma, beta, num_heads, src_mask):
+    if src_mask is not None and src_mask.dim != 4 :
+        src_mask = src_mask.unsqueeze(1).unsqueeze(2)
     sublayer_output = assemble_multi_head_attention_forward(y, encoder_output, encoder_output, w_q, w_k, w_v, w_o, num_heads, src_mask)
     return apply_residual_add_and_norm(y, sublayer_output, gamma, beta)
 

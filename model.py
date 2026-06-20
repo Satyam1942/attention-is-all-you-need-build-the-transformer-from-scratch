@@ -533,8 +533,27 @@ def init_embedding_and_projection_parameters(vocab_size, d_model, tie_weights=Tr
         'output_projection':  shared_val if tie_weights else torch.randn((vocab_size, d_model), requires_grad = True) ,
     }
 
-# Step 55 - collect_model_parameters_into_list (not yet solved)
-# TODO: implement
+# Step 55 - collect_model_parameters_into_list
+import torch
+def collect_model_parameters_into_list(encoder_layer_params, decoder_layer_params, embedding_params):
+    unique_params = []
+    seen_ids = set()
+    
+    def add_params_from_dict(dictionary):
+        for value in dictionary.values():
+            if id(value) not in seen_ids:
+                unique_params.append(value)
+                seen_ids.add(id(value))
+                
+    for dictionary in encoder_layer_params:
+        add_params_from_dict(dictionary)
+        
+    for dictionary in decoder_layer_params:
+        add_params_from_dict(dictionary)
+        
+    add_params_from_dict(embedding_params)
+    
+    return unique_params
 
 # Step 56 - shift_targets_right_with_start_token (not yet solved)
 # TODO: implement

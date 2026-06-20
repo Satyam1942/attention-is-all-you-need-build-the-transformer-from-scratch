@@ -391,8 +391,33 @@ def decoder_layer_feed_forward_sublayer(y, w1, b1, w2, b2, gamma, beta):
     sub_layer_output = position_wise_feed_forward_network(y, w1, b1, w2, b2)
     return apply_residual_add_and_norm(y, sub_layer_output, gamma, beta)
 
-# Step 46 - assemble_decoder_layer (not yet solved)
-# TODO: implement
+# Step 46 - assemble_decoder_layer
+def assemble_decoder_layer(y, encoder_output, layer_params, num_heads, src_mask, tgt_mask):
+    # print(layer_params)
+    # return torch.tensor(5)
+    w_q_self = layer_params['w_q_self']
+    w_k_self = layer_params['w_k_self']
+    w_v_self = layer_params['w_v_self']
+    w_o_self = layer_params['w_o_self']
+    self_gamma = layer_params['self_gamma']
+    self_beta = layer_params['self_beta']
+    output =  decoder_layer_masked_self_attention_sublayer(y, w_q_self, w_k_self, w_v_self, w_o_self,self_gamma, self_beta, num_heads, tgt_mask)
+    
+    w_q_cross = layer_params['w_q_cross']
+    w_k_cross = layer_params['w_k_cross']
+    w_v_cross = layer_params['w_v_cross']
+    w_o_cross = layer_params['w_o_cross']
+    cross_gamma = layer_params['cross_gamma']
+    cross_beta = layer_params['cross_beta']
+    output =  decoder_layer_cross_attention_sublayer(output, encoder_output, w_q_cross, w_k_cross, w_v_cross, w_o_cross, cross_gamma, cross_beta, num_heads, src_mask)
+    
+    w1 = layer_params['w1']
+    b1 = layer_params['b1']
+    w2 = layer_params['w2']
+    b2 = layer_params['b2']
+    ffn_gamma = layer_params['ffn_gamma'] 
+    ffn_beta = layer_params['ffn_beta']
+    return  decoder_layer_feed_forward_sublayer(output, w1, b1, w2, b2, ffn_gamma, ffn_beta)
 
 # Step 47 - stack_decoder_layers (not yet solved)
 # TODO: implement

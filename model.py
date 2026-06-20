@@ -254,11 +254,11 @@ def split_qkv_into_heads(q, k, v, num_heads):
 
 # Step 29 - multi_head_scaled_dot_product_attention
 import torch
-import math
+
 def multi_head_scaled_dot_product_attention(q_h, k_h, v_h, mask=None):
     attention_scores = q_h@k_h.transpose(-2,-1)
-    d_k = q_h.shape[-1]
-    scaled_attention_scores = attention_scores/math.sqrt(d_k)
+    d_k = torch.tensor(q_h.shape[-1])
+    scaled_attention_scores = attention_scores/torch.sqrt(d_k)
     if mask is not None :
         masked_attention_scores  = scaled_attention_scores.masked_fill(mask==False, float('-inf')) 
     else :
@@ -375,8 +375,12 @@ def decoder_layer_masked_self_attention_sublayer(y, w_q, w_k, w_v, w_o, gamma, b
     sublayer_output = assemble_multi_head_attention_forward(y, y, y, w_q, w_k, w_v, w_o, num_heads, tgt_mask)
     return apply_residual_add_and_norm(y, sublayer_output, gamma, beta)
 
-# Step 44 - decoder_layer_cross_attention_sublayer (not yet solved)
-# TODO: implement
+# Step 44 - decoder_layer_cross_attention_sublayer
+import torch
+
+def decoder_layer_cross_attention_sublayer(y, encoder_output, w_q, w_k, w_v, w_o, gamma, beta, num_heads, src_mask):
+    sublayer_output = assemble_multi_head_attention_forward(y, encoder_output, encoder_output, w_q, w_k, w_v, w_o, num_heads, src_mask)
+    return apply_residual_add_and_norm(y, sublayer_output, gamma, beta)
 
 # Step 45 - decoder_layer_feed_forward_sublayer (not yet solved)
 # TODO: implement

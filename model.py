@@ -442,8 +442,40 @@ def apply_log_softmax_over_vocab(logits):
     log_softmax = nn.LogSoftmax(dim = -1)
     return log_softmax(logits)
 
-# Step 51 - run_transformer_forward (not yet solved)
-# TODO: implement
+# Step 51 - run_transformer_forward
+def run_transformer_forward(src_ids, tgt_ids, model_params, num_heads, pad_id):
+
+    d_model = model_params['token_embedding'].shape[1]
+    vocab_len = model_params['token_embedding'].shape[0]
+    src_seq_len = src_ids.shape[1]
+    trg_seq_len = tgt_ids.shape[1]
+
+    src_mask = build_padding_mask(src_ids, pad_id)
+    tgt_mask =  build_padding_mask(tgt_ids, pad_id) & build_causal_mask(trg_seq_len)
+    
+
+    token_emb_weights = model_params['token_embedding']
+    src_emb = token_emb_weights[src_ids]
+    tgt_emb = token_emb_weights[tgt_ids]
+
+    src_emb = scale_embeddings_by_sqrt_d_model(src_emb, d_model)
+    tgt_emb = scale_embeddings_by_sqrt_d_model(tgt_emb, d_model)
+
+    pe_src =  build_sinusoidal_positional_encoding(src_seq_len, d_model)
+    pe_tgt =   build_sinusoidal_positional_encoding(trg_seq_len, d_model)
+    x = add_positional_encoding_to_embeddings(src_emb, pe_src)
+    y = add_positional_encoding_to_embeddings(tgt_emb, pe_tgt)
+
+    encoder_layer_params_list = model_params['encoder_layers']
+    encoder_output = stack_encoder_layers(x, encoder_layer_params_list, num_heads, src_mask)
+    
+    decoder_layer_params_list = model_params['decoder_layers']
+    decoder_output = stack_decoder_layers(y, encoder_output, decoder_layer_params_list, num_heads, src_mask, tgt_mask)
+    
+    output_projection_weight = model_params['output_projection']
+    logits = apply_final_output_projection(decoder_output, output_projection_weight)
+   
+    return apply_log_softmax_over_vocab(logits)
 
 # Step 52 - init_encoder_layer_parameters (not yet solved)
 # TODO: implement

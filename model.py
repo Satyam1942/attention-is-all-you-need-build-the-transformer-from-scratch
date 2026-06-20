@@ -436,8 +436,11 @@ import torch
 def tie_output_projection_to_token_embeddings(token_embedding_weight):
     return token_embedding_weight.transpose(-2, -1)
 
-# Step 50 - apply_log_softmax_over_vocab (not yet solved)
-# TODO: implement
+# Step 50 - apply_log_softmax_over_vocab
+import torch.nn as nn
+def apply_log_softmax_over_vocab(logits):
+    log_softmax = nn.LogSoftmax(dim = -1)
+    return log_softmax(logits)
 
 # Step 51 - run_transformer_forward (not yet solved)
 # TODO: implement

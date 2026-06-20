@@ -477,8 +477,25 @@ def run_transformer_forward(src_ids, tgt_ids, model_params, num_heads, pad_id):
    
     return apply_log_softmax_over_vocab(logits)
 
-# Step 52 - init_encoder_layer_parameters (not yet solved)
-# TODO: implement
+# Step 52 - init_encoder_layer_parameters
+import torch
+import math
+
+def init_encoder_layer_parameters(d_model, num_heads, d_ff):
+    return {
+            'w_q' :  torch.randn((d_model, d_model), dtype=torch.float32, requires_grad=True),
+            'w_k' :  torch.randn((d_model, d_model), dtype=torch.float32, requires_grad=True),
+            'w_v' :  torch.randn((d_model, d_model), dtype=torch.float32, requires_grad=True),
+            'w_o' :  torch.randn((d_model, d_model), dtype=torch.float32, requires_grad=True),
+            'w1' :  (torch.randn((d_model, d_ff), dtype=torch.float32)*0.1).requires_grad_(),
+            'b1' :  torch.zeros(d_ff, dtype=torch.float32, requires_grad=True),
+            'w2' :  torch.randn((d_ff, d_model), dtype=torch.float32, requires_grad=True),
+            'b2' :  torch.zeros(d_model, dtype=torch.float32, requires_grad=True),
+            'attn_gamma' : torch.ones(d_model,dtype=torch.float32,  requires_grad=True),
+            'attn_beta' : torch.zeros(d_model, dtype=torch.float32, requires_grad=True),
+            'ffn_gamma' : torch.ones(d_model, dtype=torch.float32, requires_grad=True),
+            'ffn_beta' : torch.zeros(d_model, dtype=torch.float32, requires_grad=True),
+        }
 
 # Step 53 - init_decoder_layer_parameters (not yet solved)
 # TODO: implement
